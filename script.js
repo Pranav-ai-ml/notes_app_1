@@ -1,75 +1,101 @@
-// Sample Data
-let items = [
-    { id: 1, title: "System Analytics", desc: "Real-time monitoring of server resources and traffic.", tags: ["Backend", "Monitor"] },
-    { id: 2, title: "UI Redesign", desc: "Update desktop interface to modern web standards.", tags: ["Frontend", "Design"] },
-    { id: 3, title: "Database Sync", desc: "Synchronize local SQLite data with cloud PostgreSQL.", tags: ["Database", "Backend"] },
-    { id: 4, title: "Client Meeting", desc: "Presentation of current progress and future roadmap.", tags: ["Meeting", "Admin"] }
-];
+let notes = JSON.parse(localStorage.getItem("notes")) || [];
+let editId = null;
 
-let editingId = null;
+const grid = document.getElementById("notesGrid");
+const searchInput = document.getElementById("searchInput");
 
-const itemGrid = document.getElementById('itemGrid');
-const searchInput = document.getElementById('searchInput');
-
-function render(filterText = '', filterTag = '') {
-    itemGrid.innerHTML = '';
-    
-    const filtered = items.filter(item => {
-        const matchesSearch = item.title.toLowerCase().includes(filterText.toLowerCase()) || 
-                              item.desc.toLowerCase().includes(filterText.toLowerCase());
-        const matchesTag = filterTag === '' || item.tags.includes(filterTag);
-        return matchesSearch && matchesTag;
-    });
-
-    filtered.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <h3>${item.title}</h3>
-            <p>${item.desc}</p>
-            <div class="tag-container">
-                ${item.tags.map(t => `<span class="tag" onclick="filterByTag('${t}')">${t}</span>`).join('')}
-            </div>
-            <div class="card-actions">
-                <button class="btn btn-primary" onclick="openEdit(${item.id})">Edit</button>
-            </div>
-        `;
-        itemGrid.appendChild(card);
-    });
+function saveToStorage() {
+  localStorage.setItem("notes", JSON.stringify(notes));
 }
 
-// Search Functionality
-searchInput.addEventListener('input', (e) => {
-    render(e.target.value);
-});
+function render(filter = "") {
+  grid.innerHTML = "";
 
-// Tag Filtering
-function filterByTag(tag) {
-    searchInput.value = ''; // Clear text search
-    render('', tag);
+  const filtered = notes.filter(note =>
+    note.title.toLowerCase().includes(filter.toLowerCase()) ||
+    note.desc.toLowerCase().includes(filter.toLowerCase()) ||
+    note.tags.some(t => t.toLowerCase().includes(filter.toLowerCase()))
+  );
+
+  filtered.forEach(note => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <h3>${note.title}</h3>
+      <p>${note.desc}</p>
+      <div class="tags">
+        ${note.tags.map(tag => `<span class="tag" onclick="filterTag('${tag}')">${tag}</span>`).join("")}
+      </div>
+      <div class="actions">
+        <button onclick="openEdit(${note.id})">Edit</button>
+        <button onclick="deleteNote(${note.id})">Delete</button>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
 }
 
-// Edit Functionality
+function addNote() {
+  const title = document.getElementById("noteTitle").value;
+  const desc = document.getElementById("noteDesc").value;
+  const tags = document.getElementById("noteTags").value.split(",").map(t => t.trim());
+
+  if (!title) return;
+
+  notes.push({
+    id: Date.now(),
+    title,
+    desc,
+    tags
+  });
+
+  saveToStorage();
+  render();
+
+  document.getElementById("noteTitle").value = "";
+  document.getElementById("noteDesc").value = "";
+  document.getElementById("noteTags").value = "";
+}
+
+function deleteNote(id) {
+  notes = notes.filter(n => n.id !== id);
+  saveToStorage();
+  render();
+}
+
 function openEdit(id) {
-    editingId = id;
-    const item = items.find(i => i.id === id);
-    document.getElementById('editTitle').value = item.title;
-    document.getElementById('editDesc').value = item.desc;
-    document.getElementById('editModal').style.display = 'flex';
-}
+  editId = id;
+  const note = notes.find(n => n.id === id);
 
-function closeModal() {
-    document.getElementById('editModal').style.display = 'none';
+  document.getElementById("editTitle").value = note.title;
+  document.getElementById("editDesc").value = note.desc;
+
+  document.getElementById("editModal").style.display = "flex";
 }
 
 function saveEdit() {
-    const item = items.find(i => i.id === editingId);
-    item.title = document.getElementById('editTitle').value;
-    item.desc = document.getElementById('editDesc').value;
-    
-    closeModal();
-    render();
+  const note = notes.find(n => n.id === editId);
+
+  note.title = document.getElementById("editTitle").value;
+  note.desc = document.getElementById("editDesc").value;
+
+  saveToStorage();
+  closeModal();
+  render();
 }
 
-// Initial Load
+function closeModal() {
+  document.getElementById("editModal").style.display = "none";
+}
+
+function filterTag(tag) {
+  render(tag);
+}
+
+searchInput.addEventListener("input", e => {
+  render(e.target.value);
+});
+
 render();
