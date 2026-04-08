@@ -1,42 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notes Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Your Notes</h1>
-            <div class="controls">
-                <input type="text" id="searchInput" placeholder="Search items or tags...">
-            </div>
-        </header>
 
-        <main id="itemGrid" class="item-grid">
-            </main>
-    </div>
+<header>
+  <h1>Notes Dashboard</h1>
+  <input type="text" id="searchInput" placeholder="Search notes or tags..." />
+</header>
 
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <h3>Edit Item</h3>
-            <div class="form-group">
-                <label>Title</label>
-                <input type="text" id="editTitle">
-            </div>
-            <div class="form-group">
-                <label>Description</label>
-                <textarea id="editDesc" rows="3"></textarea>
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
-            </div>
-        </div>
-    </div>
+<div class="container">
 
-    <script src="script.js"></script>
+  <div class="add-note">
+    <input type="text" id="noteTitle" placeholder="Title"/>
+    <textarea id="noteDesc" placeholder="Write your note..."></textarea>
+    <input type="text" id="noteTags" placeholder="Tags (comma separated)"/>
+    <button onclick="addNote()">Add Note</button>
+  </div>
+
+  <div id="notesGrid" class="grid"></div>
+
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <h3>Edit Note</h3>
+    <input id="editTitle"/>
+    <textarea id="editDesc"></textarea>
+    <button onclick="saveEdit()">Save</button>
+    <button onclick="closeModal()">Cancel</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
