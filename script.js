@@ -1,3 +1,5 @@
+document.addEventListener("DOMContentLoaded", () => {
+
 let notes = JSON.parse(localStorage.getItem("notes")) || [];
 let editId = null;
 
@@ -42,7 +44,10 @@ function addNote() {
   const desc = document.getElementById("noteDesc").value;
   const tags = document.getElementById("noteTags").value.split(",").map(t => t.trim());
 
-  if (!title) return;
+  if (!title) {
+    alert("Title required");
+    return;
+  }
 
   notes.push({
     id: Date.now(),
@@ -99,3 +104,13 @@ searchInput.addEventListener("input", e => {
 });
 
 render();
+
+// 👇 IMPORTANT: expose functions for buttons
+window.addNote = addNote;
+window.deleteNote = deleteNote;
+window.openEdit = openEdit;
+window.filterTag = filterTag;
+window.saveEdit = saveEdit;
+window.closeModal = closeModal;
+
+});
